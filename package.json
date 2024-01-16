@@ -5,7 +5,10 @@
   "description": "Fragments back-end API",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --config .eslintrc.js \"./src/**/*.js\""
+    "lint": "eslint --config .eslintrc.js \"./src/**/*.js\"",
+    "start": "node src/server.js",
+    "dev": "cross-env LOG_LEVEL=debug nodemon ./src/server.js --watch src",
+    "debug": "cross-env LOG_LEVEL=debug nodemon --inspect=0.0.0.0:9229 ./src/server.js --watch src"
   },
   "repository": {
     "type": "git",
@@ -14,7 +17,9 @@
   "author": "Steven David Pillay",
   "license": "UNLICENSED",
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
+    "nodemon": "^3.0.2",
     "prettier": "3.2.1"
   },
   "dependencies": {
@@ -24,6 +29,13 @@
     "helmet": "^7.1.0",
     "pino": "^8.17.2",
     "pino-http": "^9.0.0",
-    "pino-pretty": "^10.3.1"
-  }
+    "pino-pretty": "^10.3.1",
+    "stoppable": "^1.1.0"
+  },
+  "bugs": {
+    "url": "https://github.com/code-Gambler/fragments/issues"
+  },
+  "homepage": "https://github.com/code-Gambler/fragments#readme",
+  "main": ".eslintrc.js",
+  "keywords": []
 }

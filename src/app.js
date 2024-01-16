@@ -37,10 +37,13 @@ app.get('/', (req, res) => {
   // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching#controlling_caching
   res.setHeader('Cache-Control', 'no-cache');
 
+  //Logging all the Environment Variables only when npm run debug is used.
+  logger.debug(process.env, "Environment Variables");
+
   // Send a 200 'OK' response with info about our repo
   res.status(200).json({
     status: 'ok',
-    author: "Steven David Pillay",
+    author,
     githubUrl: 'https://github.com/code-Gambler/fragments',
     version,
   });
