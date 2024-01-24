@@ -30,24 +30,12 @@ app.use(cors());
 // Use gzip/deflate compression middleware
 app.use(compression());
 
-// Define a simple health check route. If the server is running
-// we'll respond with a 200 OK.  If not, the server isn't healthy.
-app.get('/', (req, res) => {
-  // Clients shouldn't cache this response (always request it fresh)
-  // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching#controlling_caching
-  res.setHeader('Cache-Control', 'no-cache');
+// modifications to src/app.js
 
-  //Logging all the Environment Variables only when npm run debug is used.
-  logger.debug(process.env, "Environment Variables");
+// Remove `app.get('/', (req, res) => {...});` and replace with:
 
-  // Send a 200 'OK' response with info about our repo
-  res.status(200).json({
-    status: 'ok',
-    author,
-    githubUrl: 'https://github.com/code-Gambler/fragments',
-    version,
-  });
-});
+// Define our routes
+app.use('/', require('./routes'));
 
 // Add 404 middleware to handle any requests for resources that can't be found
 app.use((req, res) => {
