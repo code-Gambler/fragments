@@ -9,7 +9,7 @@ const authenticate = require('./auth');
 
 // Author: Steven David Pillay
 // Version: 0.0.1
-const { author, version } = require('../package.json');
+//const { author, version } = require('../package.json');
 
 const logger = require('./logger');
 const pino = require('pino-http')({
