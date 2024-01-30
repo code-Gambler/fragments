@@ -7,6 +7,9 @@ const compression = require('compression');
 const passport = require('passport');
 const authenticate = require('./auth');
 
+//Import our Error Response function
+const { createErrorResponse } = require('./response');
+
 // Author: Steven David Pillay
 // Version: 0.0.1
 //const { author, version } = require('../package.json');
@@ -62,18 +65,21 @@ app.use((err, req, res, next) => {
   const status = err.status || 500;
   const message = err.message || 'unable to process request';
 
-  // If this is a server error, log something so we can see what's going on.
-  if (status > 499) {
-    logger.error({ err }, `Error processing request`);
-  }
-
-  res.status(status).json({
+  //Object that is returned during 404
+  const error404Obj = {
     status: 'error',
     error: {
       message,
       code: status,
     },
-  });
+  };
+
+  // If this is a server error, log something so we can see what's going on.
+  if (status > 499) {
+    logger.error({ err }, `Error processing request`);
+  }
+
+  res.status(status).json(createErrorResponse(error404Obj));
 });
 
 // Export our `app` so we can access it in server.js
