@@ -4,6 +4,8 @@ const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
 
+const logger = require('../logger');
+
 // Functions for working with fragment metadata/data using our DB
 const {
   readFragment,
@@ -15,8 +17,34 @@ const {
 } = require('./data');
 
 class Fragment {
-  constructor({ id, ownerId, created, updated, type, size = 0 }) {
-    // TODO
+  constructor({ id, ownerId, created = new Date().toISOString(), updated = new Date(), type, size = 0 }) {
+    if (ownerId == undefined) {
+      throw new Error('Please provide the OwnerId');
+    }
+
+    if (type == undefined) {
+      throw new Error('Please provide Type');
+    }
+
+    if (typeof size !== 'number') {
+      throw new Error('size must be a number');
+    }
+    if (size < 0) {
+      throw new Error('Size must not be Negative');
+    }
+    if (!Fragment.isSupportedType(type)) {
+      throw new Error('invalid type');
+    }
+
+    this.id = id || randomUUID();
+    this.ownerId = ownerId;
+    this.created = created || created.toISOString();
+    this.updated = updated || updated.toISOString();
+    this.type = type;
+    this.size = size || 0;
+
+    logger.info(`Created new fragment`);
+    logger.debug(`Fragment details: ${JSON.stringify(this)}`);
   }
 
   /**
@@ -26,7 +54,8 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
-    // TODO
+    logger.debug(`Pulling list of fragments for User: ${ownerId}`);
+    return listFragments(ownerId, expand);
   }
 
   /**
@@ -36,7 +65,8 @@ class Fragment {
    * @returns Promise<Fragment>
    */
   static async byId(ownerId, id) {
-    // TODO
+    logger.debug(`Pulling MetaData for the fragment with id: ${id}`);
+    return new Fragment(await readFragment(ownerId, id));
   }
 
   /**
@@ -46,7 +76,9 @@ class Fragment {
    * @returns Promise<void>
    */
   static delete(ownerId, id) {
-    // TODO
+    logger.info(`Deleting Fragment`);
+    logger.debug(`Deleting Fragment of id:${id}, for Owner with: ${ownerId}`);
+    return deleteFragment(ownerId, id);
   }
 
   /**
@@ -54,7 +86,10 @@ class Fragment {
    * @returns Promise<void>
    */
   save() {
-    // TODO
+    logger.info(`Saving MetaData for the fragment`);
+    logger.debug(`Saving MetaData for the fragment with id: ${this.id}`);
+    this.updated = new Date().toISOString();
+    return writeFragment(this);
   }
 
   /**
@@ -62,7 +97,9 @@ class Fragment {
    * @returns Promise<Buffer>
    */
   getData() {
-    // TODO
+    logger.info(`Pulling Data for the fragment`);
+    logger.debug(`Pulling Data for the fragment with id: ${this.id}`);
+    return readFragmentData(this.ownerId, this.id);
   }
 
   /**
@@ -71,7 +108,16 @@ class Fragment {
    * @returns Promise<void>
    */
   async setData(data) {
-    // TODO
+    if (Buffer.isBuffer(data)) {
+      this.size = data.length;
+      await this.save();
+      logger.info(`Setting Data for fragment`);
+      logger.debug(`Setting Data for fragment with id: ${this.id}`);
+      return await writeFragmentData(this.ownerId, this.id, data);
+    }
+    else {
+      throw new Error('Please provide a Buffer!')
+    }
   }
 
   /**
@@ -89,7 +135,11 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
-    // TODO
+    if (this.type.indexOf('text') !== -1) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -97,7 +147,12 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    // TODO
+    if (this.mimeType == "text/plain") {
+      return ["text/plain"];
+    }
+    else {
+      return []
+    }
   }
 
   /**
@@ -106,7 +161,18 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    // TODO
+    let type = value;
+    if (value.indexOf(';') != -1) {
+      type = value.slice(0, value.indexOf(';'));
+    }
+    if (type == 'text/plain') {
+      logger.debug(`Supported type of ${value}`);
+      return true;
+    }
+    else {
+      logger.debug(`Unsupported type of ${value}`);
+      return false;
+    }
   }
 }
 
