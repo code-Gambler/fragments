@@ -2,8 +2,8 @@
 # and hosting our fragments service inside a container.
 # The link to the documentation - https://docs.docker.com/engine/reference/builder/
 
-# Use node version 18.13.0
-FROM node:20.11.0
+# Use node version 20.11.0
+FROM node:20.11.0@sha256:7bf4a586b423aac858176b3f683e35f08575c84500fbcfd1d433ad8568972ec6
 
 LABEL maintainer="Steven David Pillay <stevendavidpillay@gmail.com>" \
       description="Fragments node.js microservice"
@@ -30,11 +30,14 @@ COPY package*.json ./
 # Install node dependencies defined in package-lock.json
 RUN npm ci
 
-# Copy src to /app/src/
-COPY ./src ./src
+# Copy src to /app/src/ and transfering the ownership to node
+COPY --chown=node:node ./src ./src
 
-# Copy our HTPASSWD file
-COPY ./tests/.htpasswd ./tests/.htpasswd
+# Copy our HTPASSWD file and transfering the ownership to node
+COPY --chown=node:node ./tests/.htpasswd ./tests/.htpasswd
+
+#Changing user to node
+USER node
 
 # Start the container by running our server
 CMD npm start
