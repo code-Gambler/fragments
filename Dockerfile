@@ -50,7 +50,7 @@ COPY --chown=node:node ./tests/.htpasswd ./tests/.htpasswd
 USER node
 
 # Start the container by running our server
-CMD node src/index.js
+CMD ["bash", "-c", "node src/index.js"]
 
 # We run our service on port 8080
 EXPOSE 8080
