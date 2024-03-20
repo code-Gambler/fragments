@@ -47,7 +47,6 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-      steps:
       # Build and Push an Image to Amazon ECR
       - name: Build and push to Amazon ECR
         env:
