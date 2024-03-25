@@ -169,6 +169,18 @@ class Fragment {
       logger.debug(`Supported type of ${value}`);
       return true;
     }
+    else if (type == 'text/markdown') {
+      logger.debug(`Supported type of ${value}`);
+      return true;
+    }
+    else if (type == 'text/html') {
+      logger.debug(`Supported type of ${value}`);
+      return true;
+    }
+    else if (type == 'application/json') {
+      logger.debug(`Supported type of ${value}`);
+      return true;
+    }
     else {
       logger.debug(`Unsupported type of ${value}`);
       return false;
