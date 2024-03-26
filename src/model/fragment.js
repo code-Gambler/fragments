@@ -150,6 +150,9 @@ class Fragment {
     if (this.mimeType == "text/plain") {
       return ["text/plain"];
     }
+    else if (this.mimeType == "text/markdown") {
+      return ["text/html"];
+    }
     else {
       return []
     }

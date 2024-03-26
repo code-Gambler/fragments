@@ -34,5 +34,35 @@ describe('GET by Id', () => {
       .auth('user1@email.com', 'password1');
     expect(res.statusCode).toBe(404);
   });
+
+  test('Conversion test from md to html', async () => {
+    const data = Buffer.from('## testing');
+    const postRes = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'text/markdown')
+      .send(data);
+    const id = postRes.headers.location.split('/').pop();
+    const getRes = await request(app)
+      .get(`/v1/fragments/${id}.html`)
+      .auth('user1@email.com', 'password1');
+    expect(getRes.statusCode).toBe(200);
+    expect(getRes.text).toBe('<h2>testing</h2>\n');
+  });
+
+  test('Conversion test from md to invalid type', async () => {
+    const data = Buffer.from('## testing');
+    const postRes = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'text/markdown')
+      .send(data);
+    const id = postRes.headers.location.split('/').pop();
+    const getRes = await request(app)
+      .get(`/v1/fragments/${id}.invalid`)
+      .auth('user1@email.com', 'password1');
+    expect(getRes.statusCode).toBe(415);
+    expect(getRes.body.error.message).toBe('Extension provided is unsupported type or fragment cannot be converted to this type');
+  });
 });
 
