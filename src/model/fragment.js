@@ -164,9 +164,12 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
+    logger.debug(`Checking Data Type`);
     let type = value;
+    logger.debug(`Data Type: ${value}`);
     if (value.indexOf(';') != -1) {
       type = value.slice(0, value.indexOf(';'));
+      logger.debug(`Data Type after triming: ${type}`);
     }
     if (type == 'text/plain') {
       logger.debug(`Supported type of ${value}`);

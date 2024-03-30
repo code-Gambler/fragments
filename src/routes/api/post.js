@@ -21,6 +21,17 @@ module.exports = async (req, res) => {
           )
         );
     }
+    else if (!Fragment.isSupportedType(req.get('Content-Type'))) {
+      logger.error(`POST Contains Unsupported Data Type of ${req.get('Content-Type')}`);
+      return res
+        .status(415)
+        .json(
+          response.createErrorResponse(
+            415,
+            `${req.get('Content-Type')} is not one of the Supported Types: text/*, application/json`
+          )
+        );
+    }
     logger.debug(`POST has a body with Proper DataType(Buffer)`);
     const fragment = new Fragment({
       ownerId: req.user,

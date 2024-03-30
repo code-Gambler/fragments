@@ -57,7 +57,7 @@ module.exports = async (req, res) => {
         }
       } else {
         logger.debug('fragment type in get id: ' + fragment.type);
-        res.set('Content-Type', fragment.type);
+        res.setHeader('Content-Type', fragment.type);
         res.status(200).send(fragmentData);
       }
     } catch (error) {
