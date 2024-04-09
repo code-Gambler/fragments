@@ -10,7 +10,6 @@ module.exports = async (req, res) => {
     const fragment = await Fragment.byId(req.user, req.params.id);
 
     logger.debug(`Pulled fragment metaData for id: ${fragment.id}`);
-
     res.status(200).json(createSuccessResponse(fragment));
 
   } catch (error) {
