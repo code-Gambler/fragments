@@ -1,4 +1,5 @@
 // src/routes/index.js
+const { hostname } = require('os');
 //Import our Successful Response function
 const { createSuccessResponse } = require('../response');
 
@@ -33,10 +34,16 @@ router.use(`/v1`, authenticate(), require('./api'));
  * we'll respond with a 200 OK.  If not, the server isn't healthy.
  */
 router.get('/', (req, res) => {
-  // Client's shouldn't cache this response (always request it fresh)
   res.setHeader('Cache-Control', 'no-cache');
-  // Send a 200 'OK' response
-  res.status(200).json(createSuccessResponse(healthCheckObj));
+  res.status(200).json(
+    createSuccessResponse({
+      author: 'Steven David Pillay',
+      githubUrl: 'https://github.com/code-Gambler/fragments',
+      version,
+      // Include the hostname in the response
+      hostname: hostname(),
+    })
+  );
 });
 
 module.exports = router;
