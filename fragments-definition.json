@@ -3,6 +3,7 @@
     "containerDefinitions": [
         {
             "name": "fragments-container",
+            "image": "",
             "cpu": 256,
             "memoryReservation": 512,
             "portMappings": [
