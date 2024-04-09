@@ -78,7 +78,7 @@ jobs:
           ECR_REPO: fragments
           VERSION_TAG: ${{ github.ref_name }}
         with:
-          task-definition: fragments-definition.json
+          task-definition: ./fragments-definition.json
           container-name: fragments
           # Use the image we just built and pushed to ECR for this tag
           image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:latest
