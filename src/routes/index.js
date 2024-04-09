@@ -15,12 +15,12 @@ const { authenticate } = require('../auth');
 const router = express.Router();
 
 //Object that is returned during health check
-const healthCheckObj = {
-  status: 'ok',
-  author,
-  githubUrl: 'https://github.com/code-Gambler/fragments',
-  version,
-}
+// const healthCheckObj = {
+//   status: 'ok',
+//   author,
+//   githubUrl: 'https://github.com/code-Gambler/fragments',
+//   version,
+// }
 
 /**
  * Expose all of our API routes on /v1/* to include an API version.
@@ -37,7 +37,7 @@ router.get('/', (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.status(200).json(
     createSuccessResponse({
-      author: 'Steven David Pillay',
+      author: author,
       githubUrl: 'https://github.com/code-Gambler/fragments',
       version,
       // Include the hostname in the response
