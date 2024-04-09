@@ -16,11 +16,7 @@
                 }
             ],
             "essential": true,
-            "environment": [
-              {
-                "AWS_S3_BUCKET_NAME":"spillay6-fragments"
-              }
-            ],
+            "environment": [],
             "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],

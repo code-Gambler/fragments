@@ -93,6 +93,7 @@ jobs:
             PORT=80
             AWS_COGNITO_CLIENT_ID=${{secrets.AWS_COGNITO_CLIENT_ID}}
             AWS_DEFAULT_REGION=us-east-1
+            AWS_S3_BUCKET_NAME:"spillay6-fragments
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
