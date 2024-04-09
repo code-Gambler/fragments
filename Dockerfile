@@ -46,8 +46,8 @@ COPY --chown=node:node ./src ./src
 # Copy our HTPASSWD file and transfering the ownership to node
 COPY --chown=node:node ./tests/.htpasswd ./tests/.htpasswd
 
-#Changing user to node
-USER node
+# #Changing user to node
+# USER node
 
 # Start the container by running our server
 CMD ["node", "src/index.js"]
