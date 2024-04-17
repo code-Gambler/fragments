@@ -51,7 +51,7 @@ app.use((req, res) => {
   res.status(404).json({
     status: 'error',
     error: {
-      message: 'not found',
+      message: 'not foundd',
       code: 404,
     },
   });
