@@ -37,7 +37,10 @@ router.get('/fragments/:id', require('./getById'));
 // get a single fragment
 router.get('/fragments/:id/info', require('./getIdInfo'));
 
-// get a single fragment
+// Delete a single fragment
 router.delete('/fragments/:id', require('./deleteById.js'));
+
+// Update a single fragment
+router.put('/fragments/:id', rawBody(), require('./putById.js'));
 
 module.exports = router;

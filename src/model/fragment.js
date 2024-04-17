@@ -187,6 +187,18 @@ class Fragment {
       logger.debug(`Supported type of ${value}`);
       return true;
     }
+    else if (type == 'image/png') {
+      logger.debug(`Supported type of ${value}`);
+      return true;
+    }
+    else if (type == 'image/jpeg') {
+      logger.debug(`Supported type of ${value}`);
+      return true;
+    }
+    else if (type == 'image/webp') {
+      logger.debug(`Supported type of ${value}`);
+      return true;
+    }
     else {
       logger.debug(`Unsupported type of ${value}`);
       return false;
