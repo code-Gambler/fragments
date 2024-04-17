@@ -1,8 +1,4 @@
-// src/routes/api/getById.js
-const path = require('path');
-const md = require('markdown-it')({
-  html: true,
-});
+// src/routes/api/putById.js
 const { createErrorResponse, createSuccessResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
@@ -11,7 +7,7 @@ module.exports = async (req, res) => {
   try {
     logger.info(`putById Route Called`);
     logger.debug(`putById Route Called ${req.params.id}`);
-    const fragment = await Fragment.byId(req.user, req.params.id.split('.')[0]);
+    let fragment = await Fragment.byId(req.user, req.params.id.split('.')[0]);
     const previousType = fragment.mimeType;
 
     logger.debug(`Checking type`);

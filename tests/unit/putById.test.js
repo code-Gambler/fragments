@@ -19,7 +19,7 @@ describe('GET /v1/fragments/:id', () => {
       .auth('user1@email.com', 'password1')
       .send('new fragment');
     const fragmentId = postRes.body.fragment.id;
-    const putRes = await request(app)
+    await request(app)
       .put(`/v1/fragments/${fragmentId}`)
       .set('Content-Type', 'text/plain')
       .auth('user1@email.com', 'password1')
