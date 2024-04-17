@@ -1,70 +1,56 @@
-// src/routes/api/getById.js
 const path = require('path');
-const md = require('markdown-it')({
-  html: true,
-});
-const { createErrorResponse } = require('../../response');
-const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
+const { Fragment } = require('../../model/fragment');
+const { createErrorResponse } = require('../../response');
 
 module.exports = async (req, res) => {
   try {
-    logger.debug(`getById Called ${req.params.id}`);
+    const extension = path.extname(req.params.id);
+    logger.debug('extension: ' + extension);
 
     const fragment = await Fragment.byId(req.user, req.params.id.split('.')[0]);
+    logger.info('got fragment metadata ' + fragment.id);
+    const data = await fragment.getData();
+    logger.info('data for ' + fragment.id + ' is ' + data);
+    const previousType = fragment.mimeType;
+    logger.debug('fragment type : ' + fragment.type);
 
-    logger.debug(`Pulled fragment metaData for id: ${fragment.id}`);
+    const validConversionTypes = Fragment.validateConversion(previousType);
+    logger.debug('valid conversion types for ' + previousType + ' are ' + validConversionTypes);
+    const convertedExtensionType = Fragment.extConvert(extension.substring(1));
 
-    try {
-      const fragmentData = await fragment.getData();
-      logger.debug(`Pulled fragment Data for id: ${fragment.id}`);
-
-      const extension = path.extname(req.params.id);
-      logger.debug('extension: ' + extension);
-      if (extension) {
-        const convertableFormats = await fragment.formats;
-        logger.debug('mimeType: ' + fragment.mimeType);
-        logger.debug('convertable formats: ' + convertableFormats);
-        let typeConvertedTo;
-        let valid = true;
-        if (extension === '.html') {
-          typeConvertedTo = 'text/html';
+    //If no conversion is needed (no extension) or its the same extension
+    if (!extension || previousType.includes(convertedExtensionType)) {
+      logger.info('Entered here');
+      res.setHeader('Content-Type', previousType);
+      res.status(200).send(data);
+    } else {
+      if (!validConversionTypes.includes(extension)) {
+        logger.debug('Not valid conversion type ' + extension + 'not in ' + validConversionTypes);
+        res.status(415).json(createErrorResponse(415, 'Not supported conversion type'));
+      } else if (previousType.startsWith('text') || previousType == 'application/json') {
+        let result = await fragment.textConvert(data, convertedExtensionType);
+        if (convertedExtensionType == 'json') {
+          res.setHeader('Content-Type', `application/${convertedExtensionType}`);
         } else {
-          valid = false;
+          res.setHeader('Content-Type', `text/${convertedExtensionType}`);
         }
-        if (!convertableFormats.includes(typeConvertedTo)) {
-          valid = false;
-        }
-        logger.debug('valid: ' + valid);
-        if (!valid) {
-          return res
-            .status(415)
-            .json(
-              createErrorResponse(
-                415,
-                'Extension provided is unsupported type or fragment cannot be converted to this type'
-              )
-            );
-        }
-        if (fragment.type === 'text/markdown' && typeConvertedTo === 'text/html') {
-          logger.debug('convert from md to html: ');
-          logger.debug(fragmentData.toString());
-          let convertedResult = md.render(fragmentData.toString());
-          logger.debug(convertedResult);
-          convertedResult = Buffer.from(convertedResult);
-          res.set('Content-Type', typeConvertedTo);
-          res.status(200).send(convertedResult);
-        }
+        res.status(200).send(Buffer.from(result));
+        logger.info(
+          { targetType: convertedExtensionType },
+          `Successful conversion to ${convertedExtensionType}`
+        );
       } else {
-        logger.debug('fragment type in get id: ' + fragment.type);
-        res.setHeader('Content-Type', fragment.type);
-        res.status(200).send(fragmentData);
+        let result = await fragment.imageConvert(convertedExtensionType);
+        res.setHeader('Content-Type', `image/${convertedExtensionType}`);
+        res.status(200).send(result);
+        logger.info(
+          { targetType: convertedExtensionType },
+          `Successful conversion to ${convertedExtensionType}`
+        );
       }
-    } catch (error) {
-      res.status(415).json(createErrorResponse(415, error.message));
     }
-  } catch (error) {
-    logger.error(`This id: ${req.params.id} is not valid`);
-    res.status(404).json(createErrorResponse(404, error.message));
+  } catch (err) {
+    res.status(404).json(createErrorResponse(404, `Unknown Fragment`));
   }
 };

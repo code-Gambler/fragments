@@ -3,8 +3,11 @@
 const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
-
 const logger = require('../logger');
+const md = require('markdown-it')({
+  html: true,
+});
+const sharp = require('sharp');
 
 // Functions for working with fragment metadata/data using our DB
 const {
@@ -202,6 +205,75 @@ class Fragment {
     else {
       logger.debug(`Unsupported type of ${value}`);
       return false;
+    }
+  }
+
+  static extConvert(extension) {
+    var type = '';
+    if (extension == '.md') {
+      type = 'markdown';
+    } else if (extension == '.txt') {
+      type = 'plain';
+    } else if (extension == '.jpg') {
+      type = 'jpeg';
+    } else {
+      type = extension;
+    }
+    return type;
+  }
+
+  async textConvert(data, value) {
+    var result;
+    if (value == 'plain') {
+      if (this.type == 'application/json') {
+        result = JSON.parse(data);
+      } else {
+        result = data;
+      }
+    } else if (value == 'html') {
+      if (this.type.endsWith('markdown')) {
+        result = md.render(data.toString());
+      }
+    }
+    return result;
+  }
+
+  async imageConvert(value) {
+    var result, fragmentData;
+    fragmentData = await this.getData();
+
+    if (this.type.startsWith('image')) {
+      if (value == 'gif') {
+        result = sharp(fragmentData).gif();
+      } else if (value == 'jpg' || value == 'jpeg') {
+        result = sharp(fragmentData).jpeg();
+      } else if (value == 'webp') {
+        result = sharp(fragmentData).webp();
+      } else if (value == 'png') {
+        result = sharp(fragmentData).png();
+      }
+    }
+    return result.toBuffer();
+  }
+
+  static validateConversion(type) {
+    switch (type) {
+      case 'text/plain':
+        return '.txt';
+      case 'text/markdown':
+        return ['.md', '.html', '.txt'];
+      case 'text/html':
+        return ['.html', '.txt'];
+      case 'application/json':
+        return ['.json', '.txt'];
+      case 'image/png':
+        return ['.png', '.jpg', '.webp', '.gif'];
+      case 'image/jpeg':
+        return ['.png', '.jpg', '.webp', '.gif'];
+      case 'image/webp':
+        return ['.png', '.jpg', '.webp', '.gif'];
+      case 'image/gif':
+        return ['.png', '.jpg', '.webp', '.gif'];
     }
   }
 }
